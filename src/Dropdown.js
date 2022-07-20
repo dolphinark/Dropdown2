@@ -1,12 +1,26 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useState, useRef } from "react";
 
 function Dropdown(props) {
-  // 原作者使用 function Dropdown({ selected, setSelected }) 
   const [isActive, setIsActive] = useState(false);
   const options = ["React", "Vue", "Angular"];
+  const menuRef = useRef();
+
+  useEffect(() => {
+    let handler = (e) => {
+      if (!menuRef.current.contains(e.target)) {
+        setIsActive(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handler);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+    };
+  }, []);
 
   return (
-    <div className="dropdown">
+    <div className="dropdown" ref={menuRef}>
       <div className="dropdown-btn" onClick={(e) => setIsActive(!isActive)}>
         {props.selected}
         <span className="fas fa-caret-down"></span>
@@ -18,8 +32,7 @@ function Dropdown(props) {
               className="dropdown-item"
               key={index}
               onClick={(e) => {
-                props.setSelected(e.target.textContent);
-                // ↑原作者改使用 setSelected(option);
+                props.setSelected(option);
                 setIsActive(false);
               }}
             >
